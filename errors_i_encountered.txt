@@ -1,0 +1,8 @@
+στο get_individual_student στο cur.execute('select * from STUDENTS where id = %s;', (studentid)) πρεπει να βαλεις κομμα
+στο (studentid, ) γιατι η εντολη δεχεται μονο tuples
+
+στο get_individual_student οταν πηγα να περασω το birth_date = row[4] εβγαζε μηνυμα 
+AttributeError: 'str' object has no attribute 'strftime' δηλαδη το row[4] ειναι αντικειμενο string και οχι datetime
+οποτε εκανα import την βιβλιοθηκη datetime και το birth_date το μετετρεψα με την εντολη birth_date = datetime.strptime(row[4], '%Y-%m-%d')
+που το κανει αντικειμενο datetime
+link: https://stackoverflow.com/questions/19887353/attributeerror-str-object-has-no-attribute-strftime

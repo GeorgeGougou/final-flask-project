@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+{%if students%}
+<table class="table table-hover">
+
+    <tr>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>E-mail</th>
+        <th>Birth Date</th>
+        <th></th>
+        <th></th>
+    </tr>
+
+    {%for student in students%}
+
+    <tr>
+        <td>{{student.id}}</td>
+        <td>{{student.firstname}}</td>
+        <td>{{student.lastname}}</td>
+        <td>{{student.email}}</td>
+        <td>{{student.birth_date}}</td>
+        <td><a class="btn btn-primary" href="/addStudent/{{student.id}}" role="button">Edit</a> 
+         <a class="btn btn-danger" href="/deleteStudent/{{student.id}}" role="button">Delete</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<h2>No Students</h2>
+{% endif %}
+{% endblock%}
