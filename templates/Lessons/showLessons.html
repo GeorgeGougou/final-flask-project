@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+{%if lessons%}
+<table class="table table-hover">
+
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Teacher</th>
+        <th></th>
+        <th></th>
+    </tr>
+
+    {%for lesson in lessons%}
+
+    <tr>
+        <td>{{lesson.id}}</td>
+        <td>{{lesson.title}}</td>
+        <td>{{lesson.teacher}}</td>
+        <td><a class="btn btn-primary" href="/addLesson/{{lesson.id}}" role="button">Edit</a> 
+         <a class="btn btn-danger" href="/deleteLesson/{{lesson.id}}" role="button">Delete</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<h2>No Lessons</h2>
+{% endif %}
+{% endblock%}

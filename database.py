@@ -27,6 +27,10 @@ def init_db():
                 'email VARCHAR(100),'
                 'birth_date DATE);'
                 )
+    cur.execute('CREATE TABLE if not exists lessons (id SERIAL PRIMARY KEY,'
+                 'title VARCHAR(100),'
+                 'teacher VARCHAR(100));'
+                 )
     conn.commit()
     cur.close()
     conn.close()
@@ -40,6 +44,16 @@ def get_students():
     cur.close()
     conn.close()
     return students
+
+def get_lessons():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM lessons;')
+    rows = cur.fetchall()
+    lessons = [DBLesson(id=row[0], title=row[1], teacher=row[2]) for row in rows]
+    cur.close()
+    conn.close()
+    return lessons
 
 def get_individual_student(studentid: int):
     conn = get_db_connection()
@@ -55,11 +69,35 @@ def get_individual_student(studentid: int):
     conn.close()
     return student
 
+def get_individual_lesson(lessonid: int):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('select * from lessons where id = %s;', (lessonid, ))
+    row = cur.fetchone()
+    print(row)
+    if row is None:
+        return None
+    lesson=DBLesson(id=row[0], title=row[1], teacher=row[2])
+    cur.close()
+    conn.close()
+    return lesson
+
+
 def save_student(student):
     conn = get_db_connection()
     cur = conn.cursor()
     sql = 'INSERT INTO students (firstname, lastname, email, birth_date) VALUES (%s, %s, %s, %s);'
     values = (student.firstname, student.lastname, student.email, student.birth_date)
+    cur.execute(sql,values)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def save_lesson(lesson):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    sql = 'INSERT INTO lessons (title, teacher) VALUES (%s, %s);'
+    values = (lesson.title, lesson.teacher)
     cur.execute(sql,values)
     conn.commit()
     cur.close()
@@ -78,6 +116,18 @@ def edit_student(student,id):
     conn.close()
 
 
+def edit_lesson(lesson,id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(
+        'UPDATE lessons SET title = %s, teacher = %s WHERE id = %s;',
+        (lesson.title, lesson.teacher, id)
+    )
+    print('query')
+    conn.commit()
+    cur.close()
+    conn.close()
+
 def delete_student(studentid: int):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -89,6 +139,22 @@ def delete_student(studentid: int):
         conn.close()
         return False
     cur.execute('DELETE FROM students WHERE id = %s;', (studentid, ))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True
+
+def delete_lesson(lessonid: int):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM lessons WHERE id = %s;', (lessonid, ))
+    row = cur.fetchone()
+    print(row)
+    if row is None:
+        cur.close()
+        conn.close()
+        return False
+    cur.execute('DELETE FROM lessons WHERE id = %s;', (lessonid, ))
     conn.commit()
     cur.close()
     conn.close()

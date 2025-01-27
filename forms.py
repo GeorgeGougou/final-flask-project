@@ -12,5 +12,5 @@ class StudentForm(FlaskForm):
 class LessonForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     teacher = SelectField('Teacher', choices=['Smith', 'Brown', 'Miller', 'Wilson', 'Jonhson'])
-
+    submit = SubmitField('Submit')
 
