@@ -27,6 +27,12 @@ class Lesson:
 
 class DBLesson(Lesson):
     def __init__(self, id, title, teacher):
-        self.id = id
+        self.id=id
         self.title=title
         self.teacher=teacher
+
+class Grade:
+    def __init__(self, student_id, lesson_id, grade):
+        self.student_id=student_id
+        self.lesson_id=lesson_id
+        self.grade=grade

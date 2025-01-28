@@ -2,7 +2,7 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 from datetime import datetime
-from models import Student, DBStudent, Lesson, DBLesson
+from models import Student, DBStudent, Lesson, DBLesson, Grade
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
@@ -31,10 +31,20 @@ def init_db():
                  'title VARCHAR(100),'
                  'teacher VARCHAR(100));'
                  )
+    cur.execute('CREATE TABLE if not exists grades (student_id INT NOT NULL,'
+                'lesson_id INT NOT NULL,'
+                'grade FLOAT NOT NULL,'
+                'PRIMARY KEY (student_id, lesson_id),'
+                'CONSTRAINT fk_student FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE,'
+                'CONSTRAINT fk_lesson FOREIGN KEY (lesson_id) REFERENCES lessons (id) ON DELETE CASCADE);'
+                 )
     conn.commit()
     cur.close()
     conn.close()
 
+
+
+#ΕΜΦΑΝΙΣΗ ΟΛΩΝ ΤΩΝ ΜΑΘΗΤΩΝ
 def get_students():
     conn = get_db_connection()
     cur = conn.cursor()
@@ -45,6 +55,7 @@ def get_students():
     conn.close()
     return students
 
+#ΕΜΦΑΝΙΣΗ ΟΛΩΝ ΤΩΝ ΜΑΘΗΜΑΤΩΝ
 def get_lessons():
     conn = get_db_connection()
     cur = conn.cursor()
@@ -55,6 +66,19 @@ def get_lessons():
     conn.close()
     return lessons
 
+
+#ΕΜΦΑΝΙΣΗ ΟΛΩΝ ΤΩΝ ΒΑΘΜΩΝ
+def get_grades():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM grades;')
+    rows = cur.fetchall()
+    grades = [Grade(student_id=row[0], lesson_id=row[1], grade=row[2]) for row in rows]
+    cur.close()
+    conn.close()
+    return grades
+
+#ΕΜΦΑΝΙΣΗ ΣΥΓΚΕΚΡΙΜΕΝΟΥ ΜΑΘΗΤΗ
 def get_individual_student(studentid: int):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -69,6 +93,7 @@ def get_individual_student(studentid: int):
     conn.close()
     return student
 
+#ΕΜΦΑΝΙΣΗ ΣΥΓΚΕΚΡΙΜΕΝΟΥ ΜΑΘΗΜΑΤΟΣ
 def get_individual_lesson(lessonid: int):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -83,6 +108,44 @@ def get_individual_lesson(lessonid: int):
     return lesson
 
 
+#ΕΜΦΑΝΙΣΗ ΒΑΘΜΩΝ ΣΥΓΚΕΡΙΜΕΝΟΥ ΦΟΙΤΗΤΗ
+def get_individual_student_grades(student_id: int):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('select * from grades where student_id = %s;', (student_id, ))
+    rows = cur.fetchall()
+    grades = [Grade(student_id=row[0], lesson_id=row[1], grade=row[2]) for row in rows]
+    cur.close()
+    conn.close()
+    return grades
+
+#ΕΜΦΑΝΙΣΗ ΒΑΘΜΩΝ ΣΥΓΚΕΡΚΙΜΕΝΟΥ ΜΑΘΗΜΑΤΟΣ
+def get_individual_lesson_grades(lesson_id: int):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('select * from grades where lesson_id = %s;', (lesson_id, ))
+    rows = cur.fetchall()
+    grades = [Grade(student_id=row[0], lesson_id=row[1], grade=row[2]) for row in rows]
+    cur.close()
+    conn.close()
+    return grades
+
+#ΕΜΦΑΝΙΣΗ ΒΑΘΜΟΥ ΜΑΘΗΤΗ ΣΕ ΣΥΓΚΕΚΡΙΜΕΝΟ ΜΑΘΗΜΑ
+def get_individual_grade(student_id: int, lesson_id : int):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('select * from grades where student_id = %s and lesson_id = %s ;', (student_id,lesson_id))
+    row = cur.fetchone()
+    print(row)
+    if row is None:
+        return None
+    grade=Grade(student_id=row[0], lesson_id=row[1], grade=row[2])
+    cur.close()
+    conn.close()
+    return grade
+
+
+#ΑΠΟΘΗΚΕΥΣΗ ΜΑΘΗΤΗ
 def save_student(student):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -93,6 +156,7 @@ def save_student(student):
     cur.close()
     conn.close()
 
+#ΑΠΟΘΗΚΕΥΣΗ ΜΑΘΗΜΑΤΟΣ
 def save_lesson(lesson):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -103,6 +167,18 @@ def save_lesson(lesson):
     cur.close()
     conn.close()
 
+#ΑΠΟΘΗΚΕΥΣΗ ΒΑΘΜΟΥ 
+def save_grade(studentGrade):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    sql = 'INSERT INTO grades (student_id, lesson_id, grade) VALUES (%s, %s, %s);'
+    values = (studentGrade.student_id, studentGrade.lesson_id, studentGrade.grade)   
+    cur.execute(sql,values)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+#ΕΠΕΞΕΡΓΑΣΙΑ ΜΑΘΗΤΗ
 def edit_student(student,id):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -115,7 +191,7 @@ def edit_student(student,id):
     cur.close()
     conn.close()
 
-
+#ΕΠΕΞΕΡΓΑΣΙΑ ΜΑΘΗΜΑΤΟΣ
 def edit_lesson(lesson,id):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -128,6 +204,20 @@ def edit_lesson(lesson,id):
     cur.close()
     conn.close()
 
+#ΕΠΕΞΕΡΓΑΣΙΑ ΒΑΘΜΟΥ
+def edit_grade(studentGrade,student_id,lesson_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(
+        'UPDATE grades SET student_id=%s, lesson_id=%s, grade = %s WHERE student_id=%s AND lesson_id=%s;',
+        (student_id,lesson_id,studentGrade.grade,student_id,lesson_id)
+    )
+    print('query')
+    conn.commit()
+    cur.close()
+    conn.close()
+
+#ΔΙΑΓΡΑΦΗ ΜΑΘΗΤΗ
 def delete_student(studentid: int):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -144,6 +234,8 @@ def delete_student(studentid: int):
     conn.close()
     return True
 
+
+#ΔΙΑΓΡΑΦΗ ΜΑΘΗΜΑΤΟΣ
 def delete_lesson(lessonid: int):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -160,6 +252,25 @@ def delete_lesson(lessonid: int):
     conn.close()
     return True
 
+#ΔΙΑΓΡΑΦΗ ΒΑΘΜΟΥ
+def delete_grade(student_id: int, lesson_id: int):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM lessons WHERE student_id = %s AND lesson_id = %s;', (student_id,lesson_id))
+    row = cur.fetchone()
+    print(row)
+    if row is None:
+        cur.close()
+        conn.close()
+        return False
+    cur.execute('DELETE FROM grades WHERE student_id = %s AND lesson_id = %s;', (student_id,lesson_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True
+
+
+#ΔΙΑΓΡΑΦΗ ΠΙΝΑΚΑ
 def delete_database():
     conn = get_db_connection()
     cur = conn.cursor()

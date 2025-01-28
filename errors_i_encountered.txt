@@ -6,3 +6,15 @@ AttributeError: 'str' object has no attribute 'strftime' δηλαδη το row[4
 οποτε εκανα import την βιβλιοθηκη datetime και το birth_date το μετετρεψα με την εντολη birth_date = datetime.strptime(row[4], '%Y-%m-%d')
 που το κανει αντικειμενο datetime
 link: https://stackoverflow.com/questions/19887353/attributeerror-str-object-has-no-attribute-strftime
+
+
+Key (student_id)=(1) is not present in table "students". Αν δεν υπηρχε ο μαθητης εβγαζε error
+
+Key (student_id, lesson_id)=(4, 1) already exists. Πρεπει να ελεγχεται αν εχουμε βαθμο εκει Χρησιμοποιησα το παρακατω
+students=get_students()
+    lessons=get_lessons()
+    form.student_id.choices=[student.id for student in students]
+    form.lesson_id.choices=[lesson.id for lesson in lessons]
+
+Χρησιμοποιησα νεα φορμα Edit form με integerfields στα student_id και lesson_id με readonly ωστε οταν γινεται 
+edit να μην μπορει να αλλαξει τα πεδια αυτα. Θα πρεπει να κανει delete
