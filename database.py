@@ -256,7 +256,7 @@ def delete_lesson(lessonid: int):
 def delete_grade(student_id: int, lesson_id: int):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM lessons WHERE student_id = %s AND lesson_id = %s;', (student_id,lesson_id))
+    cur.execute('SELECT * FROM grades WHERE student_id = %s AND lesson_id = %s;', (student_id,lesson_id))
     row = cur.fetchone()
     print(row)
     if row is None:
@@ -269,12 +269,56 @@ def delete_grade(student_id: int, lesson_id: int):
     conn.close()
     return True
 
+#ΜΕΤΡΗΣΗ ΜΕΣΟΥ ΟΡΟΥ ΚΑΘΕ ΜΑΘΗΤΗ
+def get_all_student_avg():
+    #ΔΗΜΙΟΥΡΓΙΑ ΕΝΟΣ ΚΕΝΟΥ DICTIONARY ΠΟΥ ΘΑ ΑΠΟΘΗΚΕΥΤΟΥΝ ΤΟ STUDENT ID ΚΑΙ Ο ΜΕΣΟΣ ΟΡΟΣ ΤΟΥ
+    student_avgs={}
+    conn = get_db_connection()
+    cur = conn.cursor()
+    #ΛΗΨΗ ΑΠΟ ΤΗΝ ΒΑΣΗ ΤΟ ΜΕΣΟ ΟΡΟ ΚΑΘΕ ΜΑΘΗΤΗ ΞΕΧΩΡΙΣΤΑ
+    cur.execute('SELECT student_id, AVG(grade) FROM grades GROUP BY student_id;')
+    rows=cur.fetchall()
+    for row in rows:
+        #ΠΡΟΣΘΗΚΗ ΣΤΟ DICTIONARY ΤΟΥ ΜΕΣΟΥ ΟΡΟΥ ΕΝΟΣ ΜΑΘΗΜΑΤΟΣ, ΕΞΑΓΩΓΗ ΤΟΥ ΑΡΙΘΜΟΥ ΑΠΟ ΤΟ TUPLE ΚΑΙ ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ
+        #ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
+        student_avgs[row[0]]=round(float(row[1]),1)
+    conn.commit()
+    cur.close()
+    conn.close()
+    return student_avgs
+
+#ΜΕΤΡΗΣΗ ΜΕΣΟΥ ΟΡΟΥ ΤΑΞΗΣ ΚΑΙ ΜΑΘΗΜΑΤΩΝ
+def get_class_avg():
+    #ΔΗΜΙΟΥΡΓΙΑ ΕΝΟΣ ΚΕΝΟΥ DICTIONARY ΠΟΥ ΘΑ ΑΠΟΘΗΚΕΥΤΟΥΝ ΤΑ LESSON ID ΚΑΙ Ο ΜΕΣΟΣ ΟΡΟΣ ΤΟΥ
+    lesson_avgs={}
+    conn = get_db_connection()
+    cur = conn.cursor()
+    #ΛΗΨΗ ΑΠΟ ΤΗΝ ΒΑΣΗ ΤΟΥ ΣΥΝΟΛΙΚΟΥ ΜΕΣΟΥ ΟΡΟΥ ΤΗΣ ΤΑΞΗΣ
+    cur.execute('SELECT AVG(grade) FROM grades')
+    #ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ ΤΟΥ ΑΡΙΘΜΟΥ ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
+    avg=cur.fetchone()
+    classAvg=round(float(avg[0]),1)
+    #ΛΗΨΗ ΑΠΟ ΤΗΝ ΒΑΣΗ ΤΟΥ ΜΕΣΟ ΟΡΟ ΚΑΘΕ ΜΑΘΗΜΑΤΟΣ ΞΕΧΩΡΙΣΤΑ
+    cur.execute('SELECT lesson_id, AVG(grade) FROM grades GROUP BY lesson_id;')
+    rows=cur.fetchall()
+    for row in rows:
+        #ΠΡΟΣΘΗΚΗ ΣΤΟ DICTIONARY ΤΟΥ ΜΕΣΟΥ ΟΡΟΥ ΕΝΟΣ ΜΑΘΗΜΑΤΟΣ, ΕΞΑΓΩΓΗ ΤΟΥ ΑΡΙΘΜΟΥ ΑΠΟ ΤΟ TUPLE ΚΑΙ ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ
+        #ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
+        lesson_avgs[row[0]]=round(float(row[1]),1)
+    conn.commit()
+    cur.close()
+    conn.close()
+    return classAvg, lesson_avgs
+        
+    
 
 #ΔΙΑΓΡΑΦΗ ΠΙΝΑΚΑ
 def delete_database():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('DROP TABLE STUDENTS')
+    cur.execute('DELETE FROM grades')
+    cur.execute('DELETE FROM lessons')
+    cur.execute('DELETE FROM students')
     conn.commit()
     cur.close()
     conn.close()

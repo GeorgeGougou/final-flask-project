@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+{%if avgs%}
+
+<p>Class average {{ classAvg }} </p>
+<table class="table table-hover">
+
+    <tr>
+        <th>Lesson ID</th>
+        <th>Class Average Score</th>
+    </tr>
+
+    {%for lesson_id, average in avgs.items()%}
+
+    <tr>
+        <td>{{lesson_id}}</td>
+        <td>{{average}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<h2>No Averages</h2>
+{% endif %}
+{% endblock%}

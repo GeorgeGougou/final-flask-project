@@ -5,13 +5,13 @@ from forms import StudentForm, LessonForm, GradeForm, EditGradeFrom
 from models import Student, DBStudent, DBLesson, Lesson, Grade
 from database import (get_db_connection, init_db, save_student, save_lesson, save_grade, get_students, get_lessons, get_individual_student, get_individual_lesson, 
                       edit_student, edit_lesson, delete_student, delete_lesson, delete_database, get_grades, get_individual_lesson_grades,
-                      get_individual_student_grades,get_individual_grade, edit_grade, delete_grade)
+                      get_individual_student_grades,get_individual_grade, edit_grade, delete_grade, get_all_student_avg, get_class_avg)
 from flask_bootstrap import Bootstrap5
 import os
 import psycopg2
 import secrets
 
-
+#ΠΙΟ ΜΕΤΑ ΝΑ ΚΑΝΩ ΤΟ FILTER ΤΩΝ ΔΕΔΟΜΕΝΩΝ ΚΑΤΑ LESSON Η STUDENTS
 
 
 app = Flask(__name__)
@@ -191,8 +191,6 @@ def edit_selected_lesson(id):
         lessons = get_lessons()
         return render_template('Lessons/showLessons.html', lessons=lessons, message="Lesson not changed")
 
-#/////////////////////////
-
 
 
 #ΣΕΛΙΔΑ ΠΟΥ ΜΕ ΤΟ ΠΑΤΗΜΑ ΤΟΥ SUBMIT ΑΝΑΝΕΩΝΕΙ ΤΑ ΔΕΔΟΜΕΝΑ ΤΟΥ ΒΑΘΜΟΥ
@@ -251,6 +249,22 @@ def delete_grade_from_db(student_id,lesson_id):
     else:
         return render_template('Grades/showGrades.html', grades=grades, message="Grade not deleted")
 
+#ΣΕΛΙΔΑ ΠΟΥ ΦΕΡΝΕΙ ΤΟΝ ΜΕΣΟ ΟΡΟ ΟΛΩΝ ΤΩΝ ΜΑΘΗΤΩΝ
+@app.route('/showAvgs')
+def student_averages():
+    avgs=get_all_student_avg()
+    if avgs:
+        return render_template('Grades/showAvgs.html', avgs=avgs, message='All students averages')
+    else:
+        return render_template('Grades/showAvgs.html', avgs=avgs, message='No grades found')
+    
+@app.route('/showClassAvgs')
+def class_averages():
+    classAvg, avgs=get_class_avg()
+    if avgs:
+        return render_template('Grades/showClassAvgs.html', avgs=avgs, classAvg=classAvg, message='Class average')
+    else:
+        return render_template('Grades/showClassAvgs.html', avgs=avgs, classAvg=classAvg, message='No grades found')
 
 @app.route('/deleteDatabase')
 def delete_the_database():
