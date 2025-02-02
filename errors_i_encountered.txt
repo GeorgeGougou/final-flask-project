@@ -21,3 +21,13 @@ edit να μην μπορει να αλλαξει τα πεδια αυτα. Θα
 
 σελιδα Να βαλω μεσους ορουσ
 Γενικο μεσο ορο ταξης και απο κατω μεσο ορο καθε μαθηματος
+
+Στο birth_date = datetime.strptime(row[4], '%Y-%m-%d') του get_individual_student εβγαζε TypeError: strptime() argument 1 must be str, not datetime.date
+δηλαδη το row[4] που ειναι αντικειμενο date πρεπει να μετατραπει σε string, οποτε χρησιμοποιησα την εξης
+συναρτηση birth_date = datetime.strptime(str(row[4]), '%Y-%m-%d').date().
+link: https://stackoverflow.com/questions/49485198/typeerror-strptime-argument-1-must-be-str-not-datetime-date-python
+
+Στο classAvg=round(float(avg[0]),1) μου εβγαζε TypeError: float() argument must be a string or a real number, not 'NoneType
+οταν δεν υπηρχαν μαθητες, διοτι η AVG() της sql σε κενο πινακα δινει null, οποτε επεστρεφε (None,). Η float
+χρειαζεται string η number, οποτε εβαλα ενα if statement που να ελεγχει αν ειναι none, και αν ειναι να δινει 
+τιμη 0 στο classAvg

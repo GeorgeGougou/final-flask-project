@@ -1,8 +1,9 @@
 import os
 import psycopg2
 from dotenv import load_dotenv
-from datetime import datetime
-from models import Student, DBStudent, Lesson, DBLesson, Grade
+from datetime import datetime, date
+from models import Student, DBStudent, Lesson, DBLesson, Grade, DBGrade
+
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
@@ -11,6 +12,7 @@ if os.path.exists(dotenv_path):
 else:
    raise RuntimeError('Not found application configuration')
 
+#ΣΥΝΔΕΣΗ ΜΕ ΤΗΝ ΒΑΣΗ
 def get_db_connection():
     conn = psycopg2.connect(host=os.environ['DB_HOST'],
         database=os.environ['DB_NAME'],
@@ -28,8 +30,8 @@ def init_db():
                 'birth_date DATE);'
                 )
     cur.execute('CREATE TABLE if not exists lessons (id SERIAL PRIMARY KEY,'
-                 'title VARCHAR(100),'
-                 'teacher VARCHAR(100));'
+                 'title VARCHAR(100) NOT NULL,'
+                 'teacher VARCHAR(100) NOT NULL);'
                  )
     cur.execute('CREATE TABLE if not exists grades (student_id INT NOT NULL,'
                 'lesson_id INT NOT NULL,'
@@ -50,7 +52,8 @@ def get_students():
     cur = conn.cursor()
     cur.execute('SELECT * FROM students;')
     rows = cur.fetchall()
-    students = [DBStudent(id=row[0], firstname=row[1], lastname=row[2], email=row[3], birth_date=row[4]) for row in rows]
+    students = [DBStudent(id=row[0], firstname=row[1], lastname=row[2], email=row[3], 
+                          birth_date=row[4]) for row in rows]
     cur.close()
     conn.close()
     return students
@@ -71,9 +74,11 @@ def get_lessons():
 def get_grades():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM grades;')
+    cur.execute('SELECT grades.student_id, grades.lesson_id, students.firstname,students.lastname,lessons.title,grades.grade FROM grades '
+                'INNER JOIN students ON grades.student_id=students.id '
+                'INNER JOIN lessons ON grades.lesson_id=lessons.id;')
     rows = cur.fetchall()
-    grades = [Grade(student_id=row[0], lesson_id=row[1], grade=row[2]) for row in rows]
+    grades = [DBGrade(student_id=row[0],lesson_id=row[1],firstname=row[2], lastname=row[3], lesson_title=row[4], grade=row[5]) for row in rows]
     cur.close()
     conn.close()
     return grades
@@ -82,12 +87,12 @@ def get_grades():
 def get_individual_student(studentid: int):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('select * from students where id = %s;', (studentid, ))
+    cur.execute('SELECT * FROM students WHERE id = %s;', (studentid, ))
     row = cur.fetchone()
     print(row)
     if row is None:
         return None
-    birth_date = datetime.strptime(row[4], '%Y-%m-%d')
+    birth_date = datetime.strptime(str(row[4]), '%Y-%m-%d').date()
     student=DBStudent(id=row[0], firstname=row[1], lastname=row[2],email=row[3], birth_date=birth_date)
     cur.close()
     conn.close()
@@ -97,7 +102,7 @@ def get_individual_student(studentid: int):
 def get_individual_lesson(lessonid: int):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('select * from lessons where id = %s;', (lessonid, ))
+    cur.execute('SELECT * FROM lessons WHERE id = %s;', (lessonid, ))
     row = cur.fetchone()
     print(row)
     if row is None:
@@ -112,7 +117,7 @@ def get_individual_lesson(lessonid: int):
 def get_individual_student_grades(student_id: int):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('select * from grades where student_id = %s;', (student_id, ))
+    cur.execute('SELECT * FROM grades WHERE student_id = %s;', (student_id, ))
     rows = cur.fetchall()
     grades = [Grade(student_id=row[0], lesson_id=row[1], grade=row[2]) for row in rows]
     cur.close()
@@ -123,7 +128,7 @@ def get_individual_student_grades(student_id: int):
 def get_individual_lesson_grades(lesson_id: int):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('select * from grades where lesson_id = %s;', (lesson_id, ))
+    cur.execute('SELECT * FROM grades WHERE lesson_id = %s;', (lesson_id, ))
     rows = cur.fetchall()
     grades = [Grade(student_id=row[0], lesson_id=row[1], grade=row[2]) for row in rows]
     cur.close()
@@ -134,7 +139,7 @@ def get_individual_lesson_grades(lesson_id: int):
 def get_individual_grade(student_id: int, lesson_id : int):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('select * from grades where student_id = %s and lesson_id = %s ;', (student_id,lesson_id))
+    cur.execute('SELECT * FROM grades WHERE student_id = %s AND lesson_id = %s ;', (student_id,lesson_id))
     row = cur.fetchone()
     print(row)
     if row is None:
@@ -171,8 +176,10 @@ def save_lesson(lesson):
 def save_grade(studentGrade):
     conn = get_db_connection()
     cur = conn.cursor()
+    #ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ ΤΟΥ ΒΑΘΜΟΥ ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
+    roundGrade=round(float(studentGrade.grade),1)
     sql = 'INSERT INTO grades (student_id, lesson_id, grade) VALUES (%s, %s, %s);'
-    values = (studentGrade.student_id, studentGrade.lesson_id, studentGrade.grade)   
+    values = (studentGrade.student_id, studentGrade.lesson_id, roundGrade)   
     cur.execute(sql,values)
     conn.commit()
     cur.close()
@@ -208,9 +215,11 @@ def edit_lesson(lesson,id):
 def edit_grade(studentGrade,student_id,lesson_id):
     conn = get_db_connection()
     cur = conn.cursor()
+    #ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ ΤΟΥ ΒΑΘΜΟΥ ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
+    roundGrade=round(float(studentGrade.grade),1)
     cur.execute(
         'UPDATE grades SET student_id=%s, lesson_id=%s, grade = %s WHERE student_id=%s AND lesson_id=%s;',
-        (student_id,lesson_id,studentGrade.grade,student_id,lesson_id)
+        (student_id,lesson_id,roundGrade,student_id,lesson_id)
     )
     print('query')
     conn.commit()
@@ -271,17 +280,25 @@ def delete_grade(student_id: int, lesson_id: int):
 
 #ΜΕΤΡΗΣΗ ΜΕΣΟΥ ΟΡΟΥ ΚΑΘΕ ΜΑΘΗΤΗ
 def get_all_student_avg():
-    #ΔΗΜΙΟΥΡΓΙΑ ΕΝΟΣ ΚΕΝΟΥ DICTIONARY ΠΟΥ ΘΑ ΑΠΟΘΗΚΕΥΤΟΥΝ ΤΟ STUDENT ID ΚΑΙ Ο ΜΕΣΟΣ ΟΡΟΣ ΤΟΥ
+    #ΔΗΜΙΟΥΡΓΙΑ ΕΝΟΣ ΚΕΝΟΥ DICTIONARY ΠΟΥ ΘΑ ΑΠΟΘΗΚΕΥΤΟΥΝ ΤΟ STUDENT ID,FIRST NAME, LAST NAME 
+    #ΚΑΙ Ο ΜΕΣΟΣ ΟΡΟΣ ΤΟΥ
     student_avgs={}
     conn = get_db_connection()
     cur = conn.cursor()
     #ΛΗΨΗ ΑΠΟ ΤΗΝ ΒΑΣΗ ΤΟ ΜΕΣΟ ΟΡΟ ΚΑΘΕ ΜΑΘΗΤΗ ΞΕΧΩΡΙΣΤΑ
-    cur.execute('SELECT student_id, AVG(grade) FROM grades GROUP BY student_id;')
+    cur.execute('SELECT grades.student_id,students.firstname,students.lastname, AVG(grades.grade) FROM grades '
+                'INNER JOIN students ON grades.student_id=students.id '
+                'GROUP BY grades.student_id, students.firstname, students.lastname;')
     rows=cur.fetchall()
     for row in rows:
         #ΠΡΟΣΘΗΚΗ ΣΤΟ DICTIONARY ΤΟΥ ΜΕΣΟΥ ΟΡΟΥ ΕΝΟΣ ΜΑΘΗΜΑΤΟΣ, ΕΞΑΓΩΓΗ ΤΟΥ ΑΡΙΘΜΟΥ ΑΠΟ ΤΟ TUPLE ΚΑΙ ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ
         #ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
-        student_avgs[row[0]]=round(float(row[1]),1)
+        averageScore=round(float(row[3]))
+        if averageScore<5:
+            result='Failed'
+        else:
+            result='Passed'
+        student_avgs[row[0]]=[row[1],row[2],averageScore,result]
     conn.commit()
     cur.close()
     conn.close()
@@ -297,28 +314,23 @@ def get_class_avg():
     cur.execute('SELECT AVG(grade) FROM grades')
     #ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ ΤΟΥ ΑΡΙΘΜΟΥ ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
     avg=cur.fetchone()
-    classAvg=round(float(avg[0]),1)
+    if avg[0]==None:
+        classAvg=0
+    else:
+        classAvg=round(float(avg[0]),1)
     #ΛΗΨΗ ΑΠΟ ΤΗΝ ΒΑΣΗ ΤΟΥ ΜΕΣΟ ΟΡΟ ΚΑΘΕ ΜΑΘΗΜΑΤΟΣ ΞΕΧΩΡΙΣΤΑ
-    cur.execute('SELECT lesson_id, AVG(grade) FROM grades GROUP BY lesson_id;')
+    cur.execute('SELECT grades.lesson_id, lessons.title, AVG(grades.grade) FROM grades ' 
+                'INNER JOIN lessons ON grades.lesson_id=lessons.id ' 
+                'GROUP BY grades.lesson_id, lessons.title;')
     rows=cur.fetchall()
     for row in rows:
         #ΠΡΟΣΘΗΚΗ ΣΤΟ DICTIONARY ΤΟΥ ΜΕΣΟΥ ΟΡΟΥ ΕΝΟΣ ΜΑΘΗΜΑΤΟΣ, ΕΞΑΓΩΓΗ ΤΟΥ ΑΡΙΘΜΟΥ ΑΠΟ ΤΟ TUPLE ΚΑΙ ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ
         #ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
-        lesson_avgs[row[0]]=round(float(row[1]),1)
+        averageScore=round(float(row[2]),1)
+        lesson_avgs[row[0]]=[row[1],averageScore]
     conn.commit()
     cur.close()
     conn.close()
     return classAvg, lesson_avgs
         
     
-
-#ΔΙΑΓΡΑΦΗ ΠΙΝΑΚΑ
-def delete_database():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('DELETE FROM grades')
-    cur.execute('DELETE FROM lessons')
-    cur.execute('DELETE FROM students')
-    conn.commit()
-    cur.close()
-    conn.close()

@@ -1,5 +1,22 @@
 {% extends 'base.html' %}
 
+{% block title %} 
+Home
+{% endblock %}
+
 {% block content %}
-<h1>THIS IS THE HOME PAGE</h1>
+
+<div></div>
+
+<div class="text-center">
+  <p class="fs-1">Class B1</p>
+</div>
+<div class="d-grid gap-2 col-6 mx-auto">
+
+  <a class="btn btn-secondary" href='/showStudents' type="button">Show Students</a>
+  <a class="btn btn-secondary" href='/showLessons' type="button">Show Lessons</a>
+  <a class="btn btn-secondary" href='/showGrades' type="button">Show Grades</a>
+  <a class="btn btn-secondary" href='/showClassAvgs' type="button">Show Class Average Grades</a>
+</div>
+
 {% endblock %}

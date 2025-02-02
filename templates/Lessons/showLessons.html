@@ -1,27 +1,42 @@
 {% extends 'base.html' %}
+{% block title %} 
+Show Lessons
+{% endblock %}
 {% block content %}
 {%if lessons%}
-<table class="table table-hover">
 
-    <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Teacher</th>
-        <th></th>
-        <th></th>
-    </tr>
+<div class="container">
+    <div class="row justify-content-center">
+        <h2 class="col-md-10">All Lessons</h2>
+        <div class="col-md-10 border custom-color">
+            <table class="table table-hover text-center">
 
-    {%for lesson in lessons%}
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Teacher</th>
+                    <th></th>
+                </tr>
 
-    <tr>
-        <td>{{lesson.id}}</td>
-        <td>{{lesson.title}}</td>
-        <td>{{lesson.teacher}}</td>
-        <td><a class="btn btn-primary" href="/addLesson/{{lesson.id}}" role="button">Edit</a> 
-         <a class="btn btn-danger" href="/deleteLesson/{{lesson.id}}" role="button">Delete</a></td>
-    </tr>
-    {% endfor %}
-</table>
+                {%for lesson in lessons%}
+
+                <tr>
+                    <td>{{lesson.id}}</td>
+                    <td>{{lesson.title}}</td>
+                    <td>{{lesson.teacher}}</td>
+                    <td><a class="btn btn-success" href="/addLesson/{{lesson.id}}" role="button">Edit</a> 
+                    <a class="btn btn-danger" href="/deleteLesson/{{lesson.id}}" role="button">Delete</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+<br>
+<div class="d-grid gap-2 col-2 mx-auto">
+    <a class="btn btn-success" href='/addStudent' type="button">Add Lesson +</a>
+</div>
+
 {% else %}
 <h2>No Lessons</h2>
 {% endif %}

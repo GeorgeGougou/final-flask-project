@@ -1,31 +1,47 @@
 {% extends 'base.html' %}
+{% block title %} 
+Show Students
+{% endblock %}
 {% block content %}
 {%if students%}
-<table class="table table-hover">
 
-    <tr>
-        <th>ID</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>E-mail</th>
-        <th>Birth Date</th>
-        <th></th>
-        <th></th>
-    </tr>
 
-    {%for student in students%}
+<div class="container">
+    <div class="row justify-content-center"> 
+        <h2 class="col-md-10">All Students</h2>       
+        <div class="col-md-10 border custom-color">
+                <table class="table table-hover text-center">
+                    <tr>
+                        <th>ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>E-mail</th>
+                        <th>Birth Date</th>
+                        <th></th>
+                    </tr>
 
-    <tr>
-        <td>{{student.id}}</td>
-        <td>{{student.firstname}}</td>
-        <td>{{student.lastname}}</td>
-        <td>{{student.email}}</td>
-        <td>{{student.birth_date}}</td>
-        <td><a class="btn btn-primary" href="/addStudent/{{student.id}}" role="button">Edit</a> 
-         <a class="btn btn-danger" href="/deleteStudent/{{student.id}}" role="button">Delete</a></td>
-    </tr>
-    {% endfor %}
-</table>
+                    {%for student in students%}
+
+                    <tr>
+                        <td>{{student.id}}</td>
+                        <td>{{student.firstname}}</td>
+                        <td>{{student.lastname}}</td>
+                        <td>{{student.email}}</td>
+                        <td>{{student.birth_date}}</td>
+                        <td><a class="btn btn-success" href="/addStudent/{{student.id}}" role="button">Edit</a> 
+                        <a class="btn btn-danger" href="/deleteStudent/{{student.id}}" role="button">Delete</a></td>
+
+                    </tr>
+                    {% endfor %}
+                </table>
+        </div>
+    </div>
+</div>
+<br>
+<div class="d-grid gap-2 col-2 mx-auto">
+    <a class="btn btn-success" href='/addStudent' type="button">Add Student +</a>
+</div>
+
 {% else %}
 <h2>No Students</h2>
 {% endif %}
