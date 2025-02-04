@@ -1,27 +1,21 @@
 {% extends 'base.html' %}
-{% block title %} 
-Show Student Average
-{% endblock %}
+{% block title %} Show Student Average {% endblock %}
 {% block content %}
-{%if avgs%}
-
+{%if avgs%} <!--ΕΛΕΓΧΟΣ ΕΑΝ ΥΠΑΡΧΟΥΝ ΒΑΘΜΟΙ, ΣΥΝΕΠΩΣ ΚΑΙ ΜΕΣΟΙ ΟΡΟΙ-->
 <div class="container">
     <div class="row justify-content-center">
         <h2 class="col-md-10">Student Average Grades</h2>
         <div class="col-md-10 border custom-color">
             <table class="table table-hover text-center">
-
-                <tr>
+                <tr> <!--ΠΙΝΑΚΑΣ ΕΜΦΑΝΙΣΗΣ ΤΟΥ ΣΥΝΟΛΙΚΟΥ ΜΕΣΟΥ ΟΡΟΥ ΚΑΘΕ ΜΑΘΗΤΗ-->
                     <th>Student ID</th>
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>Average Score</th>
                     <th>Result</th>
                 </tr>
-
                 {%for student_id, average in avgs.items()%}
-
-                <tr>
+                <tr><!-- ΠΡΟΣΠΕΛΑΣΗ ΟΛΩΝ ΤΩΝ ΜΑΘΗΤΩΝ ΚΑΙ ΜΕΣΩΝ ΟΡΩΝ ΑΠΟ ΤΗ ΒΑΣΗ -->
                     <td>{{student_id}}</td>
                     <td>{{average[0]}}</td>
                     <td>{{average[1]}}</td>
@@ -32,8 +26,10 @@ Show Student Average
         </div>
     </div>
 </div>
-           
+<!-- ΟΡΙΖΟΥΜΕ ΤΙ ΘΑ ΕΜΦΑΝΙΣΤΕΙ ΕΑΝ ΔΕΝ ΥΠΑΡΧΟΥΝ ΒΑΘΜΟΙ -->
 {% else %}
-<h2>No Averages</h2>
+<div class="text-center">
+    <h2>No Grades Found</h2>
+    </div>
 {% endif %}
 {% endblock%}

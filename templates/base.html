@@ -8,26 +8,16 @@
    <title>{% block title %} {% endblock %} - FlaskApp</title>
    </head>
    
-
    <style>
-
-    body {
-      font-family: 'Arial', sans-serif;
-      font-size: 16px;
-      background-color: rgba(144, 196, 241, 0.253);
-    }
-
-    .border{
-      border-radius: 15px;
-    }
-
-    .custom-color{
-      background-color: rgb(255, 255, 255);
-    }
-
+   /* CSS ΓΙΑ ΚΑΛΥΤΕΡΗ ΕΜΦΑΝΙΣΗ ΤΩΝ ELEMENTS ΤΩΝ ΣΕΛΙΔΩΝ */
+    body { font-family: 'Arial', sans-serif; font-size: 16px;
+    background-color: rgba(144, 196, 241, 0.253);}
+    .border {border-radius: 15px;}
+    .custom-color {background-color: rgb(255, 255, 255);}
    </style>
 
    <body>
+    <!-- ΠΡΟΣΘΗΚΗ ΣΤΑΘΕΡΟΥ ΜΕΝΟΥ ΓΙΑ ΤΗΝ ΠΡΟΣΒΑΣΗ ΣΕ ΟΛΕΣ ΤΙΣ ΣΕΛΙΔΕΣ -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
         <div class="container-fluid">
           <a class="navbar-brand">CLASS B1</a>
@@ -80,13 +70,14 @@
           </div>
         </div>
       </nav>
+      <!-- ΕΜΦΑΝΙΣΗ ΜΗΝΥΜΑΤΟΣ ΟΤΑΝ ΕΚΤΕΛΕΣΤΗΚΕ ΕΠΙΤΥΧΩΣ ΜΙΑ ΛΕΙΤΟΥΡΓΙΑ -->
       {% if successMsg %}
       <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{successMsg}}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
       {% endif %}
-
+      <!-- ΕΜΦΑΝΙΣΗ ΜΗΝΥΜΑΤΟΣ ΟΤΑΝ ΔΕΝ ΕΚΤΕΛΕΣΤΗΚΕ ΜΙΑ ΛΕΙΤΟΥΡΓΙΑ -->
       {% if warningMsg %}
       <div class="alert alert-warning alert-dismissible fade show" role="alert">
         {{warningMsg}}

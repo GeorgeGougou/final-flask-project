@@ -1,3 +1,4 @@
+#IMPORT ΤΙΣ ΑΠΑΡΑΙΤΗΤΕΣ ΒΙΒΛΙΟΘΗΚΕΣ
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, DateField, SelectField, DecimalField
 from wtforms.validators import DataRequired, Length, Email, NumberRange, ReadOnly

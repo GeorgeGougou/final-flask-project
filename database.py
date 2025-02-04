@@ -1,9 +1,9 @@
+#IMPORT ΤΙΣ ΑΠΑΡΑΙΤΗΤΕΣ ΒΙΒΛΙΟΘΗΚΕΣ ΚΑΙ ΚΛΑΣΕΙΣ
 import os
 import psycopg2
 from dotenv import load_dotenv
 from datetime import datetime, date
 from models import Student, DBStudent, Lesson, DBLesson, Grade, DBGrade
-
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
@@ -20,6 +20,7 @@ def get_db_connection():
         password=os.environ['DB_PASS'])
     return conn
 
+#FUNCTION ΔΗΜΙΟΥΡΓΙΑΣ ΤΩΝ ΠΙΝΑΚΩΝ 
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
@@ -44,8 +45,6 @@ def init_db():
     cur.close()
     conn.close()
 
-
-
 #ΕΜΦΑΝΙΣΗ ΟΛΩΝ ΤΩΝ ΜΑΘΗΤΩΝ
 def get_students():
     conn = get_db_connection()
@@ -69,21 +68,24 @@ def get_lessons():
     conn.close()
     return lessons
 
-
 #ΕΜΦΑΝΙΣΗ ΟΛΩΝ ΤΩΝ ΒΑΘΜΩΝ
 def get_grades():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT grades.student_id, grades.lesson_id, students.firstname,students.lastname,lessons.title,grades.grade FROM grades '
+    #ΛΗΨΗ ΤΩΝ FIRST NAME, LAST NAME, LESSON TITLE ΑΠΟ ΤΟΥΣ ΠΙΝΑΚΕΣ STUDENTS ΚΑΙ LESSONS ΓΙΑ ΠΙΟ ΑΝΑΛΥΤΙΚΗ
+    #ΕΜΦΑΝΙΣΗ ΤΩΝ ΒΑΘΜΩΝ 
+    cur.execute('SELECT grades.student_id, grades.lesson_id, students.firstname,'
+                'students.lastname,lessons.title,grades.grade FROM grades '
                 'INNER JOIN students ON grades.student_id=students.id '
                 'INNER JOIN lessons ON grades.lesson_id=lessons.id;')
     rows = cur.fetchall()
-    grades = [DBGrade(student_id=row[0],lesson_id=row[1],firstname=row[2], lastname=row[3], lesson_title=row[4], grade=row[5]) for row in rows]
+    grades = [DBGrade(student_id=row[0],lesson_id=row[1],firstname=row[2], lastname=row[3],
+                       lesson_title=row[4], grade=row[5]) for row in rows]
     cur.close()
     conn.close()
     return grades
 
-#ΕΜΦΑΝΙΣΗ ΣΥΓΚΕΚΡΙΜΕΝΟΥ ΜΑΘΗΤΗ
+#ΕΜΦΑΝΙΣΗ ΣΥΓΚΕΚΡΙΜΕΝΟΥ ΜΑΘΗΤΗ ME ΙD ΠΟΥ ΔΙΝΕΤΑΙ ΑΠΟ ΤΟΝ ΧΡΗΣΤΗ
 def get_individual_student(studentid: int):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -92,13 +94,14 @@ def get_individual_student(studentid: int):
     print(row)
     if row is None:
         return None
+    #ΜΕΤΑΤΡΟΠΗ ΤΟΥ ΣΤΟΙΧΕΙΟΥ birth_date ΠΟΥ ΕΙΝΑΙ ΤΥΠΟΥ DATE ΣΕ STRING
     birth_date = datetime.strptime(str(row[4]), '%Y-%m-%d').date()
     student=DBStudent(id=row[0], firstname=row[1], lastname=row[2],email=row[3], birth_date=birth_date)
     cur.close()
     conn.close()
     return student
 
-#ΕΜΦΑΝΙΣΗ ΣΥΓΚΕΚΡΙΜΕΝΟΥ ΜΑΘΗΜΑΤΟΣ
+#ΕΜΦΑΝΙΣΗ ΣΥΓΚΕΚΡΙΜΕΝΟΥ ΜΑΘΗΜΑΤΟΣ ME ΙD ΠΟΥ ΔΙΝΕΤΑΙ ΑΠΟ ΤΟΝ ΧΡΗΣΤΗ
 def get_individual_lesson(lessonid: int):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -112,30 +115,7 @@ def get_individual_lesson(lessonid: int):
     conn.close()
     return lesson
 
-
-#ΕΜΦΑΝΙΣΗ ΒΑΘΜΩΝ ΣΥΓΚΕΡΙΜΕΝΟΥ ΦΟΙΤΗΤΗ
-def get_individual_student_grades(student_id: int):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM grades WHERE student_id = %s;', (student_id, ))
-    rows = cur.fetchall()
-    grades = [Grade(student_id=row[0], lesson_id=row[1], grade=row[2]) for row in rows]
-    cur.close()
-    conn.close()
-    return grades
-
-#ΕΜΦΑΝΙΣΗ ΒΑΘΜΩΝ ΣΥΓΚΕΡΚΙΜΕΝΟΥ ΜΑΘΗΜΑΤΟΣ
-def get_individual_lesson_grades(lesson_id: int):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM grades WHERE lesson_id = %s;', (lesson_id, ))
-    rows = cur.fetchall()
-    grades = [Grade(student_id=row[0], lesson_id=row[1], grade=row[2]) for row in rows]
-    cur.close()
-    conn.close()
-    return grades
-
-#ΕΜΦΑΝΙΣΗ ΒΑΘΜΟΥ ΜΑΘΗΤΗ ΣΕ ΣΥΓΚΕΚΡΙΜΕΝΟ ΜΑΘΗΜΑ
+#ΕΜΦΑΝΙΣΗ ΒΑΘΜΟΥ ΜΑΘΗΤΗ ΣΕ ΣΥΓΚΕΚΡΙΜΕΝΟ ΜΑΘΗΜΑ ΜΕ STUDENT ID ΚΑΙ LESSON ID ΠΟΥ ΚΑΤΑΧΩΡΕΙ Ο ΧΡΗΣΤΗΣ
 def get_individual_grade(student_id: int, lesson_id : int):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -148,7 +128,6 @@ def get_individual_grade(student_id: int, lesson_id : int):
     cur.close()
     conn.close()
     return grade
-
 
 #ΑΠΟΘΗΚΕΥΣΗ ΜΑΘΗΤΗ
 def save_student(student):
@@ -185,7 +164,7 @@ def save_grade(studentGrade):
     cur.close()
     conn.close()
 
-#ΕΠΕΞΕΡΓΑΣΙΑ ΜΑΘΗΤΗ
+#ΕΠΕΞΕΡΓΑΣΙΑ ΜΑΘΗΤΗ ΜΕ ID ΠΟΥ ΔΙΝΕΤΑΙ ΑΠΟ ΤΟΝ ΧΡΗΣΤΗ
 def edit_student(student,id):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -198,7 +177,7 @@ def edit_student(student,id):
     cur.close()
     conn.close()
 
-#ΕΠΕΞΕΡΓΑΣΙΑ ΜΑΘΗΜΑΤΟΣ
+#ΕΠΕΞΕΡΓΑΣΙΑ ΜΑΘΗΜΑΤΟΣ ΜΕ ID ΠΟΥ ΔΙΝΕΤΑΙ ΑΠΟ ΤΟΝ ΧΡΗΣΤΗ
 def edit_lesson(lesson,id):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -211,7 +190,7 @@ def edit_lesson(lesson,id):
     cur.close()
     conn.close()
 
-#ΕΠΕΞΕΡΓΑΣΙΑ ΒΑΘΜΟΥ
+#ΕΠΕΞΕΡΓΑΣΙΑ ΒΑΘΜΟΥ ΜΕ STUDENT ID ΚΑΙ LESSON ID ΠΟΥ ΔΙΝΕΤΑΙ ΑΠΟ ΤΟΝ ΧΡΗΣΤΗ
 def edit_grade(studentGrade,student_id,lesson_id):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -226,7 +205,7 @@ def edit_grade(studentGrade,student_id,lesson_id):
     cur.close()
     conn.close()
 
-#ΔΙΑΓΡΑΦΗ ΜΑΘΗΤΗ
+#ΔΙΑΓΡΑΦΗ ΜΑΘΗΤΗ ΜΕ ID ΠΟΥ ΔΙΝΕΤΑΙ ΑΠΟ ΤΟΝ ΧΡΗΣΤΗ
 def delete_student(studentid: int):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -243,8 +222,7 @@ def delete_student(studentid: int):
     conn.close()
     return True
 
-
-#ΔΙΑΓΡΑΦΗ ΜΑΘΗΜΑΤΟΣ
+#ΔΙΑΓΡΑΦΗ ΜΑΘΗΜΑΤΟΣ ΜΕ ID ΠΟΥ ΔΙΝΕΤΑΙ ΑΠΟ ΤΟΝ ΧΡΗΣΤΗ
 def delete_lesson(lessonid: int):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -261,7 +239,7 @@ def delete_lesson(lessonid: int):
     conn.close()
     return True
 
-#ΔΙΑΓΡΑΦΗ ΒΑΘΜΟΥ
+#ΔΙΑΓΡΑΦΗ ΒΑΘΜΟΥ ΜΕ STUDENT ID ΚΑΙ LESSON ID ΠΟΥ ΔΙΝΕΤΑΙ ΑΠΟ ΤΟΝ ΧΡΗΣΤΗ
 def delete_grade(student_id: int, lesson_id: int):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -280,24 +258,25 @@ def delete_grade(student_id: int, lesson_id: int):
 
 #ΜΕΤΡΗΣΗ ΜΕΣΟΥ ΟΡΟΥ ΚΑΘΕ ΜΑΘΗΤΗ
 def get_all_student_avg():
-    #ΔΗΜΙΟΥΡΓΙΑ ΕΝΟΣ ΚΕΝΟΥ DICTIONARY ΠΟΥ ΘΑ ΑΠΟΘΗΚΕΥΤΟΥΝ ΤΟ STUDENT ID,FIRST NAME, LAST NAME 
-    #ΚΑΙ Ο ΜΕΣΟΣ ΟΡΟΣ ΤΟΥ
+    #ΔΗΜΙΟΥΡΓΙΑ ΕΝΟΣ ΚΕΝΟΥ DICTIONARY ΠΟΥ ΘΑ ΑΠΟΘΗΚΕΥΤΟΥΝ ΤΑ STUDENT ID,FIRST NAME, LAST NAME 
+    #ΚΑΙ Ο ΜΕΣΟΣ ΟΡΟΣ ΤΟΥΣ
     student_avgs={}
     conn = get_db_connection()
     cur = conn.cursor()
     #ΛΗΨΗ ΑΠΟ ΤΗΝ ΒΑΣΗ ΤΟ ΜΕΣΟ ΟΡΟ ΚΑΘΕ ΜΑΘΗΤΗ ΞΕΧΩΡΙΣΤΑ
-    cur.execute('SELECT grades.student_id,students.firstname,students.lastname, AVG(grades.grade) FROM grades '
+    cur.execute('SELECT grades.student_id,students.firstname,students.lastname,'
+                'AVG(grades.grade) FROM grades '
                 'INNER JOIN students ON grades.student_id=students.id '
                 'GROUP BY grades.student_id, students.firstname, students.lastname;')
     rows=cur.fetchall()
     for row in rows:
-        #ΠΡΟΣΘΗΚΗ ΣΤΟ DICTIONARY ΤΟΥ ΜΕΣΟΥ ΟΡΟΥ ΕΝΟΣ ΜΑΘΗΜΑΤΟΣ, ΕΞΑΓΩΓΗ ΤΟΥ ΑΡΙΘΜΟΥ ΑΠΟ ΤΟ TUPLE ΚΑΙ ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ
-        #ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
-        averageScore=round(float(row[3]))
+        #ΕΞΑΓΩΓΗ ΤΟΥ ΑΡΙΘΜΟΥ ΑΠΟ ΤΟ TUPLE ΚΑΙ ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
+        averageScore=round(float(row[3]),1)
         if averageScore<5:
             result='Failed'
         else:
             result='Passed'
+        #ΠΡΟΣΘΗΚΗ ΣΤΟ DICTIONARY ΤΟΥ ΜΕΣΟΥ ΟΡΟΥ ΕΝΟΣ ΜΑΘΗΤΗ ΚΑΙ ΤΩΝ ΥΠΟΛΟΙΠΩΝ ΣΤΟΙΧΕΙΩΝ
         student_avgs[row[0]]=[row[1],row[2],averageScore,result]
     conn.commit()
     cur.close()
@@ -306,7 +285,7 @@ def get_all_student_avg():
 
 #ΜΕΤΡΗΣΗ ΜΕΣΟΥ ΟΡΟΥ ΤΑΞΗΣ ΚΑΙ ΜΑΘΗΜΑΤΩΝ
 def get_class_avg():
-    #ΔΗΜΙΟΥΡΓΙΑ ΕΝΟΣ ΚΕΝΟΥ DICTIONARY ΠΟΥ ΘΑ ΑΠΟΘΗΚΕΥΤΟΥΝ ΤΑ LESSON ID ΚΑΙ Ο ΜΕΣΟΣ ΟΡΟΣ ΤΟΥ
+    #ΔΗΜΙΟΥΡΓΙΑ ΕΝΟΣ ΚΕΝΟΥ DICTIONARY ΠΟΥ ΘΑ ΑΠΟΘΗΚΕΥΤΟΥΝ ΤΑ ΣΤΟΙΧΕΙΑ ΤΟΥ ΜΑΘΗΜΑΤΟΣ ΚΑΙ Ο ΜΕΣΟΣ ΟΡΟΣ ΤΟΥ
     lesson_avgs={}
     conn = get_db_connection()
     cur = conn.cursor()
@@ -314,7 +293,9 @@ def get_class_avg():
     cur.execute('SELECT AVG(grade) FROM grades')
     #ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ ΤΟΥ ΑΡΙΘΜΟΥ ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
     avg=cur.fetchone()
+    #ΕΛΕΓΧΟΣ ΑΝ ΔΕΝ ΥΠΑΡΧΕΙ ΚΑΤΑΧΩΡΗΜΕΝΟΣ ΒΑΘΜΟΣ
     if avg[0]==None:
+        #ΜΗΔΕΝΙΣΜΟΣ ΤΟΥ ΜΕΣΟΥ ΟΡΟΥ 
         classAvg=0
     else:
         classAvg=round(float(avg[0]),1)
@@ -324,9 +305,9 @@ def get_class_avg():
                 'GROUP BY grades.lesson_id, lessons.title;')
     rows=cur.fetchall()
     for row in rows:
-        #ΠΡΟΣΘΗΚΗ ΣΤΟ DICTIONARY ΤΟΥ ΜΕΣΟΥ ΟΡΟΥ ΕΝΟΣ ΜΑΘΗΜΑΤΟΣ, ΕΞΑΓΩΓΗ ΤΟΥ ΑΡΙΘΜΟΥ ΑΠΟ ΤΟ TUPLE ΚΑΙ ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ
-        #ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
+        #ΕΞΑΓΩΓΗ ΤΟΥ ΑΡΙΘΜΟΥ ΑΠΟ ΤΟ TUPLE ΚΑΙ ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
         averageScore=round(float(row[2]),1)
+        #ΠΡΟΣΘΗΚΗ ΣΤΟ DICTIONARY ΤΟΥ ΜΕΣΟΥ ΟΡΟΥ ΕΝΟΣ ΜΑΘΗΜΑΤΟΣ ΚΑΙ ΤΩΝ ΥΠΟΛΟΙΠΩΝ ΣΤΟΙΧΕΙΩΝ
         lesson_avgs[row[0]]=[row[1],averageScore]
     conn.commit()
     cur.close()

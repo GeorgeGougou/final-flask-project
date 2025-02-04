@@ -1,18 +1,15 @@
 {% extends 'base.html' %}
-{% block title %} 
-Add Grade
-{% endblock %}
+{% block title %} Add Grade {% endblock %}
 {% from 'bootstrap5/form.html' import render_form %}
 {% block content %}
-{{name}}
 <div class="container">
  <div class="row">
    <div class="col-md-10 col-lg-8 mx-lg-auto mx-md-auto">
     <h2>Add a lesson grade</h2>
-     {{ render_form(form) }}
-     <p class="pt-5"><strong>{{ message }}</strong></p>
+     {{ render_form(form) }} <!--ΕΜΦΑΝΙΣΗ ΤΗΣ ΦΟΡΜΑΣ GradeForm -->
+    <br>
+    <p>*Grade will be rounded to 1 decimal</p>
    </div>
  </div>
 </div>
-
 {% endblock%}

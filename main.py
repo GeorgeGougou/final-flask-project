@@ -1,14 +1,13 @@
-#IMPORT ΤΩΝ MODULE ΚΑΙ FUNCTION ΠΟΥ ΘΑ ΧΡΗΣΙΜΟΠΟΙΗΣΟΥΜΕ
-from flask import Flask, redirect, url_for, request, render_template
+#IMPORT ΤΩΝ ΒΙΒΛΙΟΘΗΚΩΝ ΚΑΙ ΚΛΑΣΕΩΝ ΠΟΥ ΘΑ ΧΡΗΣΙΜΟΠΟΙΗΣΟΥΜΕ
+from flask import Flask, request, render_template
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
 from forms import StudentForm, LessonForm, GradeForm, EditGradeFrom
 from models import Student, DBStudent, DBLesson, Lesson, Grade, DBGrade
 from database import (get_db_connection, init_db, save_student, save_lesson, save_grade, get_students, 
                       get_lessons, get_individual_student, get_individual_lesson, edit_student, edit_lesson,
-                      delete_student, delete_lesson, get_grades, get_individual_lesson_grades,
-                      get_individual_student_grades, get_individual_grade, edit_grade, delete_grade, 
-                      get_all_student_avg, get_class_avg)
+                      delete_student, delete_lesson, get_grades,get_individual_grade, edit_grade, 
+                      delete_grade, get_all_student_avg, get_class_avg)
 from flask_bootstrap import Bootstrap5
 import os
 import psycopg2
@@ -66,9 +65,11 @@ def show_student_form():
             save_student(student)
             print(student)
             students=get_students()
-            return render_template('Students/showStudents.html', students=students, successMsg='Student Added')
+            return render_template('Students/showStudents.html', students=students, 
+                                   successMsg='Student Added')
         else:
-            return render_template('Students/addStudent.html', form=form, warningMsg='Something went wrong!')
+            return render_template('Students/addStudent.html', form=form, 
+                                   warningMsg='Something went wrong!')
 
 #ΣΕΛΙΔΑ ΠΟΥ ΠΡΟΣΘΕΤΕΙ ΕΝΑ ΜΑΘΗΜΑ
 @app.route('/addLesson', methods=['GET', 'POST'])
@@ -85,7 +86,7 @@ def show_lesson_form():
             lessons=get_lessons()
             return render_template('Lessons/showLessons.html', lessons=lessons, successMsg='Lesson Added')
         else:
-            return render_template('Lessons/addLesson.html', form=form, message='Something went wrong!') 
+            return render_template('Lessons/addLesson.html', form=form, warningMsg='Something went wrong!') 
 
 #ΣΕΛΙΔΑ ΠΟΥ ΠΡΟΣΘΕΤΕΙ ΕΝΑ ΒΑΘΜΟ
 @app.route('/addGrade', methods=['GET', 'POST'])
@@ -114,7 +115,7 @@ def show_grade_form():
                                        warningMsg='Student already has a grade in this lesson')
             else:
                 grades=get_grades()
-                return render_template('Grades/showGrades.html', students=students, successMsg='Grade Added')
+                return render_template('Grades/showGrades.html', grades=grades, successMsg='Grade Added')
         else:
             return render_template('Grades/addGrade.html', form=form, warningMsg='Something went wrong')  
          
@@ -149,7 +150,6 @@ def show_grade(student_id,lesson_id):
     else:
         return render_template('Grades/addGrade.html', warningMsg="Grade not found")  
 
-
 #ΣΕΛΙΔΑ ΠΟΥ ΜΕ ΤΟ ΠΑΤΗΜΑ ΤΟΥ SUBMIT ΑΝΑΝΕΩΝΕΙ ΤΑ ΔΕΔΟΜΕΝΑ ΤΟΥ ΜΑΘΗΤΗ
 @app.route('/addStudent/<int:id>', methods=['POST'])
 def edit_selected_student(id):
@@ -164,8 +164,8 @@ def edit_selected_student(id):
         return render_template('Students/showStudents.html', students=students, successMsg="Student changed")
     else:
         students = get_students()
-        return render_template('Students/showStudents.html', students=students, warningMsg="Student not found")
-
+        return render_template('Students/showStudents.html', students=students, 
+                               warningMsg="Student not found")
 
 #ΣΕΛΙΔΑ ΠΟΥ ΜΕ ΤΟ ΠΑΤΗΜΑ ΤΟΥ SUBMIT ΑΝΑΝΕΩΝΕΙ ΤΑ ΔΕΔΟΜΕΝΑ ΤΟΥ ΜΑΘΗΜΑΤΟΣ
 @app.route('/addLesson/<int:id>', methods=['POST'])
@@ -181,8 +181,6 @@ def edit_selected_lesson(id):
     else:
         lessons = get_lessons()
         return render_template('Lessons/showLessons.html', lessons=lessons, warningMsg="Lesson not found")
-
-
 
 #ΣΕΛΙΔΑ ΠΟΥ ΜΕ ΤΟ ΠΑΤΗΜΑ ΤΟΥ SUBMIT ΑΝΑΝΕΩΝΕΙ ΤΑ ΔΕΔΟΜΕΝΑ ΤΟΥ ΒΑΘΜΟΥ
 @app.route('/addGrade/<int:student_id>/<int:lesson_id>', methods=['POST'])
@@ -202,7 +200,6 @@ def edit_selected_grade(student_id,lesson_id):
     else:
         grades = get_grades()
         return render_template('Grades/showGrades.html', grades=grades, warningMsg="Grade not found")
-
 
 #ΣΕΛΙΔΑ ΠΟΥ ΔΙΑΓΡΑΦΕΙ ΕΝΑ ΜΑΘΗΤΗ
 @app.route('/deleteStudent/<int:id>')
@@ -241,23 +238,12 @@ def delete_grade_from_db(student_id,lesson_id):
 @app.route('/showAvgs')
 def student_averages():
     avgs=get_all_student_avg()
-    if avgs:
-        return render_template('Average_Scores/showAvgs.html', avgs=avgs)
-    else:
-        return render_template('Average_Scores/showAvgs.html', avgs=avgs, warningMsg='No grades found')
+    return render_template('Average_Scores/showAvgs.html', avgs=avgs)
 
 #ΣΕΛΙΔΑ ΠΟΥ ΦΕΡΝΕΙ ΤΟΝ ΜΕΣΟ ΟΡΟ ΤΗΣ ΤΑΞΗΣ  
 @app.route('/showClassAvgs')
 def class_averages():
     classAvg, avgs=get_class_avg()
-    if avgs:
-        return render_template('Average_Scores/showClassAvgs.html', avgs=avgs, classAvg=classAvg)
-    else:
-        return render_template('Average_Scores/showClassAvgs.html', avgs=avgs, classAvg=classAvg, 
-                               warningMsg='No grades found')
+    return render_template('Average_Scores/showClassAvgs.html', avgs=avgs, classAvg=classAvg)
 
 
-@app.route('/dropTables')
-def dropTables():
-    droptable()
-    return render_template('home.html')

@@ -1,28 +1,22 @@
 {% extends 'base.html' %}
-{% block title %} 
-Show Class Average
-{% endblock %}
+{% block title %} Show Class Average {% endblock %}
 {% block content %}
-{%if avgs%}
-
+{%if avgs%} <!--ΕΛΕΓΧΟΣ ΕΑΝ ΥΠΑΡΧΟΥΝ ΒΑΘΜΟΙ, ΣΥΝΕΠΩΣ ΚΑΙ ΜΕΣΟΙ ΟΡΟΙ-->
+<!-- ΕΜΦΑΝΙΣΗ ΤΟΥ ΣΥΝΟΛΙΚΟΥ ΜΕΣΟΥ ΟΡΟΥ ΤΗΣ ΤΑΞΗΣ -->
 <h2 class="text-center">Class Average Grade <span class="badge text-bg-secondary">{{ classAvg }}</span></h2>
 <br>
-
 <div class="container">
     <div class="row justify-content-center">
-        <h2 class="col-md-10">Average Grade By lesson</h2>
+        <h2 class="col-md-10">Average Grade By Lesson</h2>
         <div class="col-md-10 border custom-color">
             <table class="table table-hover text-center">
-
-                <tr>
+                <tr><!--ΠΙΝΑΚΑΣ ΕΜΦΑΝΙΣΗΣ ΟΛΩΝ ΤΩΝ ΜΕΣΩΝ ΟΡΩΝ ΤΩΝ ΜΑΘΗΤΩΝ ΑΝΑ ΜΑΘΗΜΑ -->
                     <th>Lesson ID</th>
                     <th>Lesson Title</th>
                     <th>Average Grade</th>
                 </tr>
-
-                {%for lesson_id, average in avgs.items()%}
-
-                <tr>
+                {%for lesson_id, average in avgs.items()%} 
+                <tr><!-- ΠΡΟΣΠΕΛΑΣΗ ΟΛΩΝ ΤΩΝ ΜΑΘΗΜΑΤΩΝ ΚΑΙ ΜΕΣΩΝ ΟΡΩΝ ΑΠΟ ΤΗ ΒΑΣΗ -->
                     <td>{{lesson_id}}</td>
                     <td>{{average[0]}}</td>
                     <td>{{average[1]}}</td>
@@ -32,8 +26,10 @@ Show Class Average
         </div>
     </div>
 </div>
-
+<!-- ΟΡΙΖΟΥΜΕ ΤΙ ΘΑ ΕΜΦΑΝΙΣΤΕΙ ΕΑΝ ΔΕΝ ΥΠΑΡΧΟΥΝ ΒΑΘΜΟΙ -->
 {% else %}
-<h2>No Grades to show Averages</h2>
+<div class="text-center">
+    <h2>No Grades Found</h2>
+    </div>
 {% endif %}
 {% endblock%}

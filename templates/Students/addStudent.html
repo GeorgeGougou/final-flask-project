@@ -1,17 +1,13 @@
 {% extends 'base.html' %}
-{% block title %} 
-Add Student
-{% endblock %}
+{% block title %} Add Student {% endblock %}
 {% from 'bootstrap5/form.html' import render_form %}
 {% block content %}
-{{name}}
 <div class="container">
  <div class="row">
    <div class="col-md-10 col-lg-8 mx-lg-auto mx-md-auto">
     <h2>Add a student</h2>
-     {{ render_form(form) }}
+    {{ render_form(form) }} <!--ΕΜΦΑΝΙΣΗ ΤΗΣ ΦΟΡΜΑΣ StudenForm -->
    </div>
  </div>
 </div>
-
 {% endblock%}

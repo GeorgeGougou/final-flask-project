@@ -41,7 +41,10 @@ class Grade:
         self.student_id=student_id
         self.lesson_id=lesson_id
         self.grade=grade
-    
+
+#ΔΗΜΙΟΥΡΓΙΑ ΚΛΑΣΗΣ DBGrade ΠΟΥ ΚΛΗΡΟΝΟΜΕΙ ΤΗΝ ΚΛΑΣΗ Grade, ΠΡΟΣΘΕΤΕΙ FIRST NAME, LAST NAME ΤΟΥ ΠΙΝΑΚΑ
+# STUDENTS ΚΑΙ LESSON_TITLE ΤΟΥ ΠΙΝΑΚΑ LESSONS ΓΙΑ ΕΜΦΑΝΙΣΗ ΤΟΥΣ ΣΤΗ ΣΕΛΙΔΑ showGrades
+     
 class DBGrade(Grade):
     def __init__(self, student_id, lesson_id, firstname, lastname, lesson_title, grade):
         self.student_id=student_id

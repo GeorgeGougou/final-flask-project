@@ -1,48 +1,44 @@
 {% extends 'base.html' %}
-{% block title %} 
-Show Students
-{% endblock %}
+{% block title %} Show Students {% endblock %}
 {% block content %}
-{%if students%}
-
-
+{%if students%} <!--ΕΛΕΓΧΟΣ ΕΑΝ ΥΠΑΡΧΟΥΝ ΜΑΘΗΤΕΣ-->
 <div class="container">
     <div class="row justify-content-center"> 
         <h2 class="col-md-10">All Students</h2>       
         <div class="col-md-10 border custom-color">
-                <table class="table table-hover text-center">
-                    <tr>
-                        <th>ID</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>E-mail</th>
-                        <th>Birth Date</th>
-                        <th></th>
-                    </tr>
-
-                    {%for student in students%}
-
-                    <tr>
-                        <td>{{student.id}}</td>
-                        <td>{{student.firstname}}</td>
-                        <td>{{student.lastname}}</td>
-                        <td>{{student.email}}</td>
-                        <td>{{student.birth_date}}</td>
-                        <td><a class="btn btn-success" href="/addStudent/{{student.id}}" role="button">Edit</a> 
-                        <a class="btn btn-danger" href="/deleteStudent/{{student.id}}" role="button">Delete</a></td>
-
+            <table class="table table-hover text-center"> 
+                <tr> <!--ΠΙΝΑΚΑΣ ΕΜΦΑΝΙΣΗΣ ΟΛΩΝ ΤΩΝ ΜΑΘΗΤΩΝ -->
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>E-mail</th>
+                    <th>Birth Date</th>
+                    <th></th>
+                </tr>
+                {%for student in students%} <!-- ΠΡΟΣΠΕΛΑΣΗ ΟΛΩΝ ΤΩΝ ΜΑΘΗΤΩΝ ΑΠΟ ΤΗΝ ΒΑΣΗ -->
+                <tr>
+                    <td>{{student.id}}</td>
+                    <td>{{student.firstname}}</td>
+                    <td>{{student.lastname}}</td>
+                    <td>{{student.email}}</td>
+                    <td>{{student.birth_date}}</td>
+                    <!-- ΚΟΥΜΠΙΑ ΓΙΑ ΕΠΕΞΕΡΓΑΣΙΑ ΚΑΙ ΔΙΑΓΡΑΦΗ ΜΑΘΗΤΗ -->
+                    <td><a class="btn btn-success" href="/addStudent/{{student.id}}" role="button">Edit</a> 
+                    <a class="btn btn-danger" href="/deleteStudent/{{student.id}}" role="button">Delete</a></td>
                     </tr>
                     {% endfor %}
-                </table>
+            </table>
         </div>
     </div>
 </div>
-<br>
+<br> <!--ΚΟΥΜΠΙ ΓΙΑ ΑΝΑΚΑΤΕΥΘΥΝΣΗ ΤΟΥ ΧΡΗΣΤΗ ΣΤΗΝ ΣΕΛΙΔΑ ΠΡΟΣΘΗΚΗΣ ΜΑΘΗΤΗ -->
 <div class="d-grid gap-2 col-2 mx-auto">
     <a class="btn btn-success" href='/addStudent' type="button">Add Student +</a>
 </div>
-
+<!-- ΟΡΙΖΟΥΜΕ ΤΙ ΘΑ ΕΜΦΑΝΙΣΤΕΙ ΕΑΝ ΔΕΝ ΥΠΑΡΧΟΥΝ ΜΑΘΗΤΕΣ -->
 {% else %}
-<h2>No Students</h2>
+<div class="text-center">
+    <h2>No Students Found</h2>
+    </div>
 {% endif %}
 {% endblock%}

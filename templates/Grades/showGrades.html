@@ -1,17 +1,13 @@
 {% extends 'base.html' %}
-{% block title %} 
-Show Grades
-{% endblock %}
+{% block title %} Show Grades {% endblock %}
 {% block content %}
-{%if grades%}
-
+{%if grades%} <!--ΕΛΕΓΧΟΣ ΕΑΝ ΥΠΑΡΧΟΥΝ ΒΑΘΜΟΙ-->
 <div class="container">
     <div class="row justify-content-center">
         <h2 class="col-md-10">All Grades</h2>
         <div class="col-md-10 border custom-color">
             <table class="table table-hover text-center">
-
-                <tr>
+                <tr> <!--ΠΙΝΑΚΑΣ ΕΜΦΑΝΙΣΗΣ ΟΛΩΝ ΤΩΝ ΒΑΘΜΩΝ -->
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>Lesson Title</th>
@@ -19,32 +15,31 @@ Show Grades
                     <th></th>
                     <th></th>
                 </tr>
-
-                {%for Indgrade in grades%}
-
+                {%for Indgrade in grades%} <!-- ΠΡΟΣΠΕΛΑΣΗ ΟΛΩΝ ΤΩΝ ΒΑΘΜΩΝ ΑΠΟ ΤΗΝ ΒΑΣΗ -->
                 <tr>
                     <td>{{Indgrade.firstname}}</td>
                     <td>{{Indgrade.lastname}}</td>
                     <td>{{Indgrade.lesson_title}}</td>
                     <td>{{Indgrade.grade}}</td>
+                    <!-- ΚΟΥΜΠΙΑ ΓΙΑ ΕΠΕΞΕΡΓΑΣΙΑ ΚΑΙ ΔΙΑΓΡΑΦΗ ΒΑΘΜΟΥ -->
                     <td><a class="btn btn-success" href="/addGrade/{{Indgrade.student_id}}/{{Indgrade.lesson_id}}" role="button">Edit</a> 
                     <a class="btn btn-danger" href="/deleteGrade/{{Indgrade.student_id}}/{{Indgrade.lesson_id}}" role="button">Delete</a></td>
                     <td></td>
                 </tr>
-
                 {% endfor %}
             </table>
         </div>
     </div>
 </div>
-<br>
+<br> <!--ΚΟΥΜΠΙ ΓΙΑ ΑΝΑΚΑΤΕΥΘΥΝΣΗ ΤΟΥ ΧΡΗΣΤΗ ΣΤΗΝ ΣΕΛΙΔΑ ΠΡΟΣΘΗΚΗΣ ΒΑΘΜΟΥ -->
 <div class="d-grid gap-2 col-2 mx-auto">
-    <a class="btn btn-success" href='/addStudent' type="button">Add Grade +</a>
+    <a class="btn btn-success" href='/addGrade' type="button">Add Grade +</a>
 </div>
-
+<!-- ΟΡΙΖΟΥΜΕ ΤΙ ΘΑ ΕΜΦΑΝΙΣΤΕΙ ΕΑΝ ΔΕΝ ΥΠΑΡΧΟΥΝ ΒΑΘΜΟΙ -->
 {% else %}
-<h2>No Grades to show Averages</h2>
-
+<div class="text-center">
+    <h2>No Grades Found</h2>
+    </div>
 {% endif %}
 
 {% endblock%}

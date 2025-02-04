@@ -1,29 +1,24 @@
 {% extends 'base.html' %}
-{% block title %} 
-Show Lessons
-{% endblock %}
+{% block title %} Show Lessons {% endblock %}
 {% block content %}
-{%if lessons%}
-
+{%if lessons%} <!--ΕΛΕΓΧΟΣ ΕΑΝ ΥΠΑΡΧΟΥΝ ΜΑΘΗΜΑΤΑ-->
 <div class="container">
     <div class="row justify-content-center">
         <h2 class="col-md-10">All Lessons</h2>
         <div class="col-md-10 border custom-color">
             <table class="table table-hover text-center">
-
-                <tr>
+                 <tr> <!--ΠΙΝΑΚΑΣ ΕΜΦΑΝΙΣΗΣ ΟΛΩΝ ΤΩΝ ΜΑΘΗΜΑΤΩΝ -->
                     <th>ID</th>
                     <th>Title</th>
                     <th>Teacher</th>
                     <th></th>
                 </tr>
-
-                {%for lesson in lessons%}
-
+                {%for lesson in lessons%} <!-- ΠΡΟΣΠΕΛΑΣΗ ΟΛΩΝ ΤΩΝ ΜΑΘΗΤΩΝ ΑΠΟ ΤΗΝ ΒΑΣΗ -->
                 <tr>
                     <td>{{lesson.id}}</td>
                     <td>{{lesson.title}}</td>
                     <td>{{lesson.teacher}}</td>
+                    <!-- ΚΟΥΜΠΙΑ ΓΙΑ ΕΠΕΞΕΡΓΑΣΙΑ ΚΑΙ ΔΙΑΓΡΑΦΗ ΜΑΘΗΜΑΤΟΣ -->
                     <td><a class="btn btn-success" href="/addLesson/{{lesson.id}}" role="button">Edit</a> 
                     <a class="btn btn-danger" href="/deleteLesson/{{lesson.id}}" role="button">Delete</a></td>
                 </tr>
@@ -32,12 +27,14 @@ Show Lessons
         </div>
     </div>
 </div>
-<br>
+<br> <!--ΚΟΥΜΠΙ ΓΙΑ ΑΝΑΚΑΤΕΥΘΥΝΣΗ ΤΟΥ ΧΡΗΣΤΗ ΣΤΗΝ ΣΕΛΙΔΑ ΠΡΟΣΘΗΚΗΣ ΜΑΘΗΜΑΤΟΣ -->
 <div class="d-grid gap-2 col-2 mx-auto">
-    <a class="btn btn-success" href='/addStudent' type="button">Add Lesson +</a>
+    <a class="btn btn-success" href='/addLesson' type="button">Add Lesson +</a>
 </div>
-
+<!-- ΟΡΙΖΟΥΜΕ ΤΙ ΘΑ ΕΜΦΑΝΙΣΤΕΙ ΕΑΝ ΔΕΝ ΥΠΑΡΧΟΥΝ ΜΑΘΗΜΑΤΑ -->
 {% else %}
-<h2>No Lessons</h2>
+<div class="text-center">
+<h2>No Lessons Found</h2>
+</div>
 {% endif %}
 {% endblock%}
