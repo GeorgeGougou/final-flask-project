@@ -22,7 +22,7 @@ csrf = CSRFProtect(app)
 foo = secrets.token_urlsafe(16)
 app.secret_key = foo
 
-#ΑΡΧΙΚΟΠΟΙΗΣΗ ΤΗΣ DATABASE
+#ΔΗΜΙΟΥΡΓΙΑ ΤΗΣ DATABASE ΕΑΝ ΔΕΝ ΥΠΑΡΧΕΙ
 init_db()
 
 #ΑΡΧΙΚΗ ΣΕΛΙΔΑ
@@ -55,10 +55,12 @@ def show_grades():
 #ΣΕΛΙΔΑ ΠΟΥ ΠΡΟΣΘΕΤΕΙ ΕΝΑΝ ΜΑΘΗΤΗ
 @app.route('/addStudent', methods=['GET', 'POST'])
 def show_student_form():
+    #ΕΜΦΑΝΙΣΗ ΤΗΣ ΦΟΡΜΑΣ ΣΥΜΠΛΗΡΩΣΗΣ ΣΤΟΙΧΕΙΩΝ
     if request.method == 'GET':
         form = StudentForm()
         return render_template('Students/addStudent.html', form=form)
     if request.method == 'POST':
+        #ΚΑΤΑΧΩΡΗΣΗ ΤΩΝ ΣΤΟΙΧΕΙΩΝ ΜΕ ΤΟ ΠΑΤΗΜΑ ΤΟΥ SUBMIT
         form = StudentForm()
         if form.validate_on_submit():
             student=Student(form.firstname.data, form.lastname.data, form.email.data, form.birth_date.data)
@@ -75,9 +77,11 @@ def show_student_form():
 @app.route('/addLesson', methods=['GET', 'POST'])
 def show_lesson_form():
     if request.method == 'GET':
+        #ΕΜΦΑΝΙΣΗ ΤΗΣ ΦΟΡΜΑΣ ΣΥΜΠΛΗΡΩΣΗΣ ΣΤΟΙΧΕΙΩΝ
         form = LessonForm()
         return render_template('Lessons/addLesson.html', form=form)
     if request.method == 'POST':
+        #ΚΑΤΑΧΩΡΗΣΗ ΤΩΝ ΣΤΟΙΧΕΙΩΝ ΜΕ ΤΟ ΠΑΤΗΜΑ ΤΟΥ SUBMIT
         form = LessonForm()
         if form.validate_on_submit():
             lesson=Lesson(form.title.data, form.teacher.data)
@@ -95,12 +99,14 @@ def show_grade_form():
     students=get_students()
     lessons=get_lessons()
     if request.method == 'GET':
+        #ΕΜΦΑΝΙΣΗ ΤΗΣ ΦΟΡΜΑΣ ΣΥΜΠΛΗΡΩΣΗΣ ΣΤΟΙΧΕΙΩΝ
         form = GradeForm()
         #ΕΜΦΑΝΙΣΗ ΤΩΝ STUDENT ID ΚΑΙ LESSON ID ΠΟΥ ΕΧΟΥΝ ΚΑΤΑΧΩΡΗΘΕΙ
         form.student_id.choices=[student.id for student in students]
         form.lesson_id.choices=[lesson.id for lesson in lessons]
         return render_template('Grades/addGrade.html', form=form)
     if request.method == 'POST':
+        #ΚΑΤΑΧΩΡΗΣΗ ΤΩΝ ΣΤΟΙΧΕΙΩΝ ΜΕ ΤΟ ΠΑΤΗΜΑ ΤΟΥ SUBMIT
         form = GradeForm()
         form.student_id.choices=[student.id for student in students]
         form.lesson_id.choices=[lesson.id for lesson in lessons]
@@ -138,7 +144,6 @@ def show_lesson(id):
         return render_template('Lessons/addLesson.html', form=form)
     else:
         return render_template('Lessons/addLesson.html', warningMsg="Lesson not found")   
-
 
 #ΣΕΛΙΔΑ ΠΟΥ ΦΕΡΝΕΙ ΣΤΗΝ ΦΟΡΜΑ GradeForm ΤΟΝ ΒΑΘΜΟ ΠΟΥ ΕΠΙΛΕΞΑΜΕ
 @app.route('/addGrade/<int:student_id>/<int:lesson_id>')

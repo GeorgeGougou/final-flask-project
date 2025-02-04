@@ -291,13 +291,13 @@ def get_class_avg():
     cur = conn.cursor()
     #ΛΗΨΗ ΑΠΟ ΤΗΝ ΒΑΣΗ ΤΟΥ ΣΥΝΟΛΙΚΟΥ ΜΕΣΟΥ ΟΡΟΥ ΤΗΣ ΤΑΞΗΣ
     cur.execute('SELECT AVG(grade) FROM grades')
-    #ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ ΤΟΥ ΑΡΙΘΜΟΥ ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
     avg=cur.fetchone()
     #ΕΛΕΓΧΟΣ ΑΝ ΔΕΝ ΥΠΑΡΧΕΙ ΚΑΤΑΧΩΡΗΜΕΝΟΣ ΒΑΘΜΟΣ
     if avg[0]==None:
         #ΜΗΔΕΝΙΣΜΟΣ ΤΟΥ ΜΕΣΟΥ ΟΡΟΥ 
         classAvg=0
     else:
+        #ΣΤΡΟΓΓΥΛΟΠΟΙΗΣΗ ΤΟΥ ΑΡΙΘΜΟΥ ΣΤΟ 1 ΔΕΚΑΔΙΚΟ
         classAvg=round(float(avg[0]),1)
     #ΛΗΨΗ ΑΠΟ ΤΗΝ ΒΑΣΗ ΤΟΥ ΜΕΣΟ ΟΡΟ ΚΑΘΕ ΜΑΘΗΜΑΤΟΣ ΞΕΧΩΡΙΣΤΑ
     cur.execute('SELECT grades.lesson_id, lessons.title, AVG(grades.grade) FROM grades ' 
